@@ -49,6 +49,9 @@ INTERACTION_NAMES = [
     "HI",
     "PP",
 ]
+TEMPFILE_DIR = "./temp"
+if not os.path.exists(TEMPFILE_DIR):
+    os.mkdir(TEMPFILE_DIR)
 
 
 def fix_seed(seed=123, deterministic=False):
@@ -472,13 +475,16 @@ def prepare_input_data(protein_fn, ligand_fn, receptor_fn):
     extract_pocket(ligand_fn, protein_fn, receptor_fn)
 
     # 2. Run POVME
+    os.chdir(TEMPFILE_DIR) # ./temp
     cmnd = (
-        f"python POVME/POVME_pocket_id.py --filename {receptor_fn} --processors 36 "
+        f"python ../POVME/POVME_pocket_id.py --filename ../{receptor_fn} --processors 4"
     )
-    povme_fn = "./pocket1.pdb"
     os.system(cmnd)
+    povme_fn = "./pocket1.pdb"
     n_povme = get_n_lines(povme_fn)
     n_lig = Chem.SDMolSupplier(lig_fn)[0].GetNumAtoms()
+    os.remove(r"./pocket[0-9].pdb")
+    os.chdir("..")
 
     # 3. Data processing
     input_data = get_process(receptor_fn, ligand_fn)
