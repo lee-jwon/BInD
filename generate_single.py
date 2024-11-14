@@ -27,7 +27,7 @@ from main.model.guidance import (
 )
 from main.model.model import NCIVAE, GenDiff
 from main.model.prior_atom import POVMESampler
-from main.utils.file import recreate_directory, write_mols_to_sdf
+from main.utils.file import recreate_directory, write_mols_to_sdf, extract_pocket
 
 
 ELSE = None
@@ -64,20 +64,6 @@ def fix_seed(seed=123, deterministic=False):
 def worker_init_fn(worker_id):
     np.random.seed(seed=123 + worker_id)
     random.seed(seed=123 + worker_id)
-
-
-def load_NCI_predictor(save_dirn):
-    conf_fn = os.path.join(save_dirn, "config.yaml")
-    with open(conf_fn, "r") as file:
-        confs = yaml.safe_load(file)
-        confs = EasyDict(confs)
-    model = NCIVAE(confs)
-    sd_fn = os.path.join(save_dirn, "model_best.pt")
-    sd = torch.load(sd_fn)
-    model.load_state_dict(sd, strict=False)
-    model.eval()
-    model.cuda()
-    return model
 
 
 def generate_single_batch(
@@ -152,8 +138,6 @@ def generate_single_batch(
     else:
         raise NotImplementedError
 
-    # trajectory, if needed
-    gen_traj = []
 
     # denoise
     for i, step in tqdm(enumerate(range(0, n_timestep)[::-1]), total=n_timestep):
@@ -365,26 +349,6 @@ def generate_single_batch(
                         gen_inter_e, timestep.cuda() - 1, inter_e_batch.cuda()
                     )
 
-        # save trajectory, if needed
-        if confs["get_trajectory"]:
-            if not train_confs["abl_igen"]:
-                interaction_dict = {}
-                for j, interaction_name in enumerate(INTERACTION_NAMES):
-                    is_inter = gen_inter_e == j + 1
-                    inter_idxs = inter_e_index[:, is_inter]
-                    interaction_dict[interaction_name] = inter_idxs.cpu().numpy()
-            else:
-                interaction_dict = None
-            gen_traj.append(
-                {
-                    "h": gen_lig_h.cpu(),
-                    "x": gen_lig_x.cpu(),
-                    "centroid": rec_graph.centroid.cpu(),
-                    "e": gen_lig_e.cpu(),
-                    "e_index": lig_graph.e_index.cpu(),
-                    "i_dict": interaction_dict,
-                }
-            )
 
         torch.cuda.empty_cache()
 
@@ -448,7 +412,7 @@ def generate_single_batch(
 
         gen_dict_list.append(graph_dict)
 
-    return gen_dict_list, gen_traj
+    return gen_dict_list
 
 
 def graph_3d_to_rdmol(h, x, edge_index, edge_attr, one_hot=True):
@@ -523,8 +487,6 @@ if __name__ == "__main__":
         format="[%(asctime)s - %(levelname)s]\n%(message)s",
         handlers=[logging.FileHandler(log_file_path), logging.StreamHandler()],
     )
-    # err_file_path = os.path.join(confs["save_dirn"], "err.err")
-    # sys.stderr = open(err_file_path, "w")
     logging.info(pformat(confs))
     time.sleep(2)
 
@@ -533,7 +495,7 @@ if __name__ == "__main__":
         fix_seed(confs["seed"])
         logging.info(f"seed fixed to {confs.seed}")
 
-    # get confs for diffusion
+    # TODO: merge train_conf with sample_conf
     train_confs_fn = os.path.join(confs["model_dirn"], "config.yaml")
     with open(train_confs_fn, "r") as file:
         train_confs = yaml.safe_load(file)
@@ -653,13 +615,9 @@ if __name__ == "__main__":
         test_idx = 0
         for _, batch in enumerate(tqdm(test_loader)):
             with torch.no_grad():
-                gen_dict_list, gen_traj = generate_single_batch(
+                gen_dict_list = generate_single_batch(
                     model, transitions, batch, train_confs, confs, predictor_model
                 )
-
-                if confs["get_trajectory"]:
-                    with open(confs["trajectory_fn"], "wb") as w:
-                        pickle.dump(gen_traj, w)
 
                 for gen_dict in gen_dict_list:
                     h_type, x, e_index, e_type, rec_centroid, interaction_dict = (
