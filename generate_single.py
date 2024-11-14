@@ -27,7 +27,9 @@ from main.model.guidance import (
 )
 from main.model.model import NCIVAE, GenDiff
 from main.model.prior_atom import POVMESampler
-from main.utils.file import recreate_directory, write_mols_to_sdf, extract_pocket
+from main.utils.file import recreate_directory, write_mols_to_sdf, extract_pocket, get_n_lines
+
+from process import get_process 
 
 
 ELSE = None
@@ -463,6 +465,26 @@ def graph_3d_to_rdmol(h, x, edge_index, edge_attr, one_hot=True):
             conf.SetAtomPosition(old_to_new[idx], Chem.rdGeometry.Point3D(*pos))
     rw_mol.AddConformer(conf)
     return rw_mol.GetMol()
+
+
+def prepare_input_data(protein_fn, ligand_fn, receptor_fn):
+    # 1. Extract pocket
+    extract_pocket(ligand_fn, protein_fn, receptor_fn)
+
+    # 2. Run POVME
+    cmnd = (
+        f"python POVME/POVME_pocket_id.py --filename {receptor_fn} --processors 36 "
+    )
+    povme_fn = "./pocket1.pdb"
+    os.system(cmnd)
+    n_povme = get_n_lines(povme_fn)
+    n_lig = Chem.SDMolSupplier(lig_fn)[0].GetNumAtoms()
+
+    # 3. Data processing
+    input_data = get_process(receptor_fn, ligand_fn)
+    input_data["v"] = n_povme
+    input_data["n"] = n_lig
+    return input_data
 
 
 if __name__ == "__main__":

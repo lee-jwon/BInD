@@ -110,6 +110,11 @@ def recreate_directory(path):
     os.makedirs(path)
     return
 
+def get_n_lines(file):
+    with open(file, "r") as file:
+        lines = file.readlines()
+    number_of_lines = len(lines)
+    return number_of_lines
 
 def extract_pocket(
         ligand_sdf,
