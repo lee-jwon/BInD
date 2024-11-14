@@ -5,7 +5,7 @@
 This repository is the official repository for BInD (**B**ond and **In**teraction generating **D**iffusion model)
 
 <p align="center">
-  <img src="assets/overview.png" width="700" height="auto" /> 
+  <img src="assets/overview.png" width=1000" height="auto" /> 
 </p>
 
 
@@ -14,8 +14,8 @@ This repository is the official repository for BInD (**B**ond and **In**teractio
 
 ### Installation of Python Packages
 ```bash
-conda create -n bindfull python=3.9 -y
-conda activate bindfull
+conda create -n bind python=3.9 -y
+conda activate bind
 
 # ML
 conda install  scipy=1.11.3 numpy=1.26.0 pandas=2.1.1 scikit-learn=1.3.0 -y
@@ -50,13 +50,14 @@ pip install seaborn==0.13.0
 
 ### Download Data and Trained Checkpoints
 
-| Data | Size | Link | Path |
-| - | - | - | - |
-| Raw data | 1.7GB | [Download raw data](https://drive.google.com/uc?export=download&id=1v1wOCpkXbemU9FE3utEXrAsVjm6pvnXN) | `data/raw/` |
-| Processed data (whole) | 3.7GB | | `data/processed/` |
-| Processed data (only test) | 3.7GB | | `data/processed/` |
-| Data split keys | ?MB | | `data/split/` |
-| Trained checkpoint | 161MB | | `save/` |
+| Data | Size | Path |
+| :- | -: | :- |
+| [Raw data](https://drive.google.com/uc?export=download&id=1v1wOCpkXbemU9FE3utEXrAsVjm6pvnXN) | 1.7GB | `data/raw/` |
+| [Processed data (whole)]() | 3.7GB | `data/processed/` |
+| [Processed data (only test)](https://drive.google.com/uc?export=download&id=1UZwes8OF3O-CjlB1rpNzLvDyZk7qvsQA) | 3.3MB | `data/processed/` |
+| [Data split keys](https://drive.google.com/uc?export=download&id=1xPtdKN_DhvvPlE2A9V5bdwjGQY_lwfWe) | 3.3MB | `data/` |
+| [POVME data](https://drive.google.com/uc?export=download&id=1lA1sHkFWvmXRim_m4S2oIOF2VPsO8zMb) | 0.7MB | `data/` |
+| [Trained checkpoint](https://drive.google.com/uc?export=download&id=17H9IBra3z9VRfSGBU4U9qNl0uO0KyU-2) | 10.7MB | `save/` |
 
 You can download the `.tar.gz` files provided above, extract them, and place the contents in the desired directory.
 
