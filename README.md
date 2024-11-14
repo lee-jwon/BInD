@@ -48,13 +48,16 @@ pip install seaborn==0.13.0
 ```
 
 ### Download Data and Trained Checkpoints
+
 | Data | Size | Link | Path |
 | - | - | - | - |
-| Raw data | 1.7GB | [Download Raw Data](https://drive.google.com/uc?export=download&id=1v1wOCpkXbemU9FE3utEXrAsVjm6pvnXN) | `data/raw/` |
+| Raw data | 1.7GB | [Download raw data](https://drive.google.com/uc?export=download&id=1v1wOCpkXbemU9FE3utEXrAsVjm6pvnXN) | `data/raw/` |
 | Processed data (whole) | 3.7GB | | `data/processed/` |
-| Processed data (test) | 3.7GB | | `data/processed/` |
+| Processed data (only test) | 3.7GB | | `data/processed/` |
 | Data split keys | ?MB | | `data/split/` |
-| Trained checkpoint | 161MB | | `data/` |
+| Trained checkpoint | 161MB | | `save/` |
+
+You can download the `.tar.gz` files provided above, extract them, and place the contents in the desired directory.
 
 
 ## Training BInD From Scratch
@@ -82,16 +85,17 @@ python -u train.py configs/train.yaml
 ## Genearting Molecules with BInD
 
 
-### Molecule Generation for Test Set Pockets
+### Molecule Generation for Test Pockets
 
 ```bash
-python generate.py configs/generate.yaml
+python generate_test_pockets.py configs/generate_test_pockets.yaml
 ```
 
 
-### Molecule Generation with a Given PDB
+### Pocket Conditioned Molecule Generation
 
 ```bash
+python generate.py configs/generate.yaml
 ```
 
 
