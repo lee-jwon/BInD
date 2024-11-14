@@ -14,8 +14,8 @@ This repository is the official repository for BInD (**B**ond and **In**teractio
 
 ### Installation of Python Packages
 ```bash
-conda create -n bind python=3.9 -y
-conda activate bind
+conda create -n bindenv python=3.9 -y
+conda activate bindenv
 
 # ML
 conda install  scipy=1.11.3 numpy=1.26.0 pandas=2.1.1 scikit-learn=1.3.0 -y
@@ -53,14 +53,14 @@ pip install seaborn==0.13.0
 | Data | Size | Path |
 | :-   |  -:  | :-   |
 | [Raw data](https://drive.google.com/uc?export=download&id=1v1wOCpkXbemU9FE3utEXrAsVjm6pvnXN) | 1.7GB | `data/raw/` |
-| [Processed data (whole)]() | 3.7GB | `data/processed/` |
+| [Processed data (whole)](https://drive.google.com/uc?export=download&id=1JoKx0bWB4sjLC2iDqxdqX-TG47blDva7) | 3.7GB | `data/processed/` |
 | [Processed data (only test)](https://drive.google.com/uc?export=download&id=1UZwes8OF3O-CjlB1rpNzLvDyZk7qvsQA) | 3.3MB | `data/processed/` |
 | [Data split keys](https://drive.google.com/uc?export=download&id=1xPtdKN_DhvvPlE2A9V5bdwjGQY_lwfWe) | 3.3MB | `data/` |
 | [POVME data](https://drive.google.com/uc?export=download&id=1lA1sHkFWvmXRim_m4S2oIOF2VPsO8zMb) | 0.7MB | `data/` |
 | [Trained checkpoint](https://drive.google.com/uc?export=download&id=17H9IBra3z9VRfSGBU4U9qNl0uO0KyU-2) | 10.7MB | `save/` |
 
 
-You can download the `.tar.gz` files provided above, extract them, and place the contents in the desired directory.
+You can download the `.tar.gz` files provided above, extract them, and place the contents in the path.
 
 
 ## Training BInD From Scratch
@@ -112,8 +112,8 @@ python generate.py configs/generate.yaml
 <table>
   <tr>
     <td align="center" style="border: none;">
-      <a href="https://github.com/oneoftwo">
-        <img src="https://github.com/oneoftwo.png?size=600" width="100" height="100">
+      <a href="https://github.com/lee-jwon">
+        <img src="https://github.com/lee-jwon.png?size=600" width="100" height="100">
         <br />
         Lee, Joongwon
       </a>
