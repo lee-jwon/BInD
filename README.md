@@ -75,10 +75,12 @@ python -u process.py
 
 ### Training
 
-To train BInD with the default settings, use the command below. You can adjust the training configurations by editing the `configs/train.yaml` file. 
-For multi-GPU training, modify the `n_gpu` and `n_workers` parameter as needed.
+To train BInD with the default settings, use the command below. 
+You can adjust the training configurations by editing the `configs/train.yaml` file. 
+For multi-GPU training, adjust the `n_gpu` and `num_workers` parameters as needed. 
+Additionally, setting the `pre_load_dataset` option to yes will load the dataset into memory in advance, reducing file I/O load.
 
-**Warning:** Setting the `save_dir` parameter will overwrite the existing directory where training checkpoints are saved.
+**Warning:** Setting the `save_dirn` parameter will overwrite the existing directory where training checkpoints are saved.
 
 ```bash
 python -u train.py configs/train.yaml
