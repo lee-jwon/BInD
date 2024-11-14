@@ -50,14 +50,43 @@ pip install seaborn==0.13.0
 
 ### Download Data and Trained Checkpoints
 
-| Data | Size | Path |
-| :- | -: | :- |
-| [Raw data](https://drive.google.com/uc?export=download&id=1v1wOCpkXbemU9FE3utEXrAsVjm6pvnXN) | 1.7GB | `data/raw/` |
-| [Processed data (whole)]() | 3.7GB | `data/processed/` |
-| [Processed data (only test)](https://drive.google.com/uc?export=download&id=1UZwes8OF3O-CjlB1rpNzLvDyZk7qvsQA) | 3.3MB | `data/processed/` |
-| [Data split keys](https://drive.google.com/uc?export=download&id=1xPtdKN_DhvvPlE2A9V5bdwjGQY_lwfWe) | 3.3MB | `data/` |
-| [POVME data](https://drive.google.com/uc?export=download&id=1lA1sHkFWvmXRim_m4S2oIOF2VPsO8zMb) | 0.7MB | `data/` |
-| [Trained checkpoint](https://drive.google.com/uc?export=download&id=17H9IBra3z9VRfSGBU4U9qNl0uO0KyU-2) | 10.7MB | `save/` |
+<table>
+  <tr>
+    <td align="center">Data</td>
+    <td align="center">Size</td>
+    <td align="center">Path</td>
+  </tr>
+  <tr style="border-top: 3px solid black;">
+    <td align="left"><a href="https://drive.google.com/uc?export=download&id=1v1wOCpkXbemU9FE3utEXrAsVjm6pvnXN">Raw data</a></td>
+    <td align="right">1.7GB</td>
+    <td align="left"><code>data/raw/</code></td>
+  </tr>
+  <tr>
+    <td align="left"><a href="#">Processed data (whole)</a></td>
+    <td align="right">3.7GB</td>
+    <td align="left"><code>data/processed/</code></td>
+  </tr>
+  <tr>
+    <td align="left"><a href="https://drive.google.com/uc?export=download&id=1UZwes8OF3O-CjlB1rpNzLvDyZk7qvsQA">Processed data (only test)</a></td>
+    <td align="right">3.3MB</td>
+    <td align="left"><code>data/processed/</code></td>
+  </tr>
+  <tr>
+    <td align="left"><a href="https://drive.google.com/uc?export=download&id=1xPtdKN_DhvvPlE2A9V5bdwjGQY_lwfWe">Data split keys</a></td>
+    <td align="right">3.3MB</td>
+    <td align="left"><code>data/</code></td>
+  </tr>
+  <tr>
+    <td align="left"><a href="https://drive.google.com/uc?export=download&id=1lA1sHkFWvmXRim_m4S2oIOF2VPsO8zMb">POVME data</a></td>
+    <td align="right">0.7MB</td>
+    <td align="left"><code>data/</code></td>
+  </tr>
+  <tr>
+    <td align="left"><a href="https://drive.google.com/uc?export=download&id=17H9IBra3z9VRfSGBU4U9qNl0uO0KyU-2">Trained checkpoint</a></td>
+    <td align="right">10.7MB</td>
+    <td align="left"><code>save/</code></td>
+  </tr>
+</table>
 
 You can download the `.tar.gz` files provided above, extract them, and place the contents in the desired directory.
 
