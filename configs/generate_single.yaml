@@ -8,7 +8,7 @@ save_dirn: generate/public_0/
 # model dirns
 test_data_dirn: data/processed/test/
 model_dirn: save/public/
-model_cut: 215 # best
+model_cut: best # best
 
 # prior atom sampling
 prior_atom:
