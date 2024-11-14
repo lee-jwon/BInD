@@ -30,6 +30,7 @@ conda install plip=2.3.0 -c conda-forge
 conda install -c conda-forge openbabel==3.1.1
 pip install meeko==0.1.dev3 scipy pdb2pqr vina==1.2.2 
 python -m pip install git+https://github.com/Valdes-Tresanco-MS/AutoDockTools_py3
+git clone https://github.com/durrantlab/POVME
 
 # posecheck
 pip install prolif==2.0.3
