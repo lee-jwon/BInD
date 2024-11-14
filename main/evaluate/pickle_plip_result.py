@@ -136,7 +136,7 @@ def get_complex_interaction_info(complex_fn, tempfile_dirn):  # lig - rec
         pairs += [[t1, t2] for t1 in rec_idx for t2 in lig_idx]
     out["PP"] = pairs
     out2["n_PP"] = len(pipis)
-    os.unlink(my_mol.sourcefiles['pdbcomplex'])
+    os.unlink(my_mol.sourcefiles["pdbcomplex"])
     assert "temp" in complex_fn
     os.system(f"rm {complex_fn[:-4]}*")
     return out, out2
@@ -234,7 +234,7 @@ def get_complex_interaction_geometry(rec_fn, lig_fn, tempfile_dirn):
         angs.append(a)
     out["PP"] = ds
     out["PP_angle"] = angs
-    os.unlink(my_mol.sourcefiles['pdbcomplex'])
+    os.unlink(my_mol.sourcefiles["pdbcomplex"])
     time.sleep(0.3)
     assert "temp" in complex_fn
     os.system(f"rm {complex_fn[:-4]}*")

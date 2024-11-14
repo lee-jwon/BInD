@@ -29,7 +29,7 @@ from main.model.model import NCIVAE, GenDiff
 from main.model.prior_atom import POVMESampler
 from main.utils.file import recreate_directory, write_mols_to_sdf, extract_pocket, get_n_lines
 
-from process import get_process 
+from process_crossdocked import get_process 
 
 
 ELSE = None
@@ -482,19 +482,20 @@ def prepare_input_data(receptor_fn, protein_fn=None, ligand_fn=None, extract=Tru
     # 2. Run POVME
     os.chdir(TEMPFILE_DIR) # ./temp
     cmnd = (
-        f"python ../POVME/POVME_pocket_id.py --filename ../{receptor_fn} --processors 4"
+        f"python ../POVME/POVME_pocket_id.py --filename ../{receptor_fn} --processors 8"
     )
     os.system(cmnd)
     povme_fn = "./pocket1.pdb"
+    os.system("pwd")
     n_povme = get_n_lines(povme_fn)
-    n_lig = Chem.SDMolSupplier(lig_fn)[0].GetNumAtoms()
-    os.remove(r"./pocket[0-9].pdb")
+    # n_lig = Chem.SDMolSupplier(ligand_fn)[0].GetNumAtoms()
+    # os.remove(r"./pocket[0-9].pdb")
     os.chdir("..")
 
     # 3. Data processing
-    input_data = get_process(receptor_fn, ligand_fn)
+    input_data = get_process(receptor_fn, ligand_fn, filter=True)
     input_data["v"] = n_povme
-    input_data["n"] = n_lig
+    input_data["n"] = input_data["lig"]["x"].shape[0]
     return input_data
 
 
@@ -549,7 +550,13 @@ if __name__ == "__main__":
 
     # prepare input
     if confs["receptor_fn"] is not None:
-        input_data = prepare_input_data(confs["receptor_fn"], extract=False)
+        # input_data = prepare_input_data(confs["receptor_fn"], extract=False)
+        input_data = prepare_input_data(
+            receptor_fn=confs["receptor_fn"],
+            protein_fn=None,
+            ligand_fn=confs["ligand_fn"],
+            extract=False
+        )
     else:
         receptor_fn = os.path.join(
             TEMPFILE_DIR, 
@@ -564,7 +571,6 @@ if __name__ == "__main__":
     input_data["my_key"] = 0
 
     logging.info(f"Generating with receptor: {input_data['rec_fn']} and ligand: {input_data['lig_fn']}")
-
     test_set = RecLigDataset(
         [input_data] * confs["bs"],
         center_to="rec",
@@ -644,7 +650,7 @@ if __name__ == "__main__":
         for _, batch in enumerate(tqdm(test_loader)):
             with torch.no_grad():
                 gen_dict_list = generate_single_batch(
-                    model, transitions, batch, train_confs, confs, predictor_model
+                    model, transitions, batch, train_confs, confs, None
                 )
 
                 for gen_dict in gen_dict_list:
@@ -658,7 +664,7 @@ if __name__ == "__main__":
                     )
                     x = x + rec_centroid
 
-                    test_fn = test_fns[test_idx]
+                    # test_fn = test_fns[test_idx]
                     ori_data_graph = test_set[test_idx]
 
                     gen_dirn = confs["save_mol_dirn"]

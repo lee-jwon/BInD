@@ -13,6 +13,7 @@ from openbabel import pybel
 from rdkit.Chem import AllChem
 from vina import Vina
 import numpy as np
+
 np.int = np.int64
 
 # from utils.reconstruct import reconstruct_from_generated
@@ -399,7 +400,7 @@ if __name__ == "__main__":
     os.unlink(temp_output_pdbqt_fn)
     os.unlink(temp_rec_pqr_log_fn)
     if method != "score_only":
-        pass 
+        pass
     else:
         os.unlink(temp_mid_sdf_fn)
     os.unlink(t1)

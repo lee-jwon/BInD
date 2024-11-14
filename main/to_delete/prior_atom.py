@@ -46,6 +46,7 @@ class UniformSampler:
         self.num_atom_sigma = num_atom_sigma
 
     def sample(self):
-        n_sampled = self.num_atom + \
-            random.randint(-self.num_atom_sigma, self.num_atom_sigma)
+        n_sampled = self.num_atom + random.randint(
+            -self.num_atom_sigma, self.num_atom_sigma
+        )
         return n_sampled

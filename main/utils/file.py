@@ -1,6 +1,7 @@
 import os
 import shutil
 from copy import deepcopy
+import numpy as np
 
 from rdkit import Chem
 from rdkit.Chem import AllChem, rdmolfiles
@@ -110,18 +111,20 @@ def recreate_directory(path):
     os.makedirs(path)
     return
 
+
 def get_n_lines(file):
     with open(file, "r") as file:
         lines = file.readlines()
     number_of_lines = len(lines)
     return number_of_lines
 
+
 def extract_pocket(
-        ligand_sdf,
-        protein_pdb,
-        pocket_pdb,
-        cutoff=10.0,
-    ):
+    ligand_sdf,
+    protein_pdb,
+    pocket_pdb,
+    cutoff=10.0,
+):
     assert os.path.exists(ligand_sdf), "No ligand sdf file"
     assert os.path.exists(protein_pdb), "No protein pdb file"
 
@@ -152,4 +155,4 @@ def extract_pocket(
     io = PDBIO()
     io.set_structure(structure)
     io.save(pocket_pdb, DistSelect())
-    return 
+    return

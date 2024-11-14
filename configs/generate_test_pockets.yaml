@@ -42,4 +42,4 @@ steric_guidance: 0.02 # 0.02
 
 # params
 bs: 10 # 10, 25, 50, 100
-n_generate: 1 # number of generation per pocket
+n_generate: 10 # number of generation per pocket

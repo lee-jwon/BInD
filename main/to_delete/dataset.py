@@ -24,7 +24,7 @@ def load_pickle_file(fn):
         return None
 
 
-def load_data_in_parallel(fns): 
+def load_data_in_parallel(fns):
     num_workers = 8
     with Pool(num_workers) as pool:
         data = list(tqdm(pool.imap(load_pickle_file, fns), total=len(fns)))
@@ -34,7 +34,14 @@ def load_data_in_parallel(fns):
 
 class RecLigDataset(Dataset):
     def __init__(
-        self, fns, center_to="none", rec_noise=0.0, mode="train", povme_test_fn=None, pre_load=True):
+        self,
+        fns,
+        center_to="none",
+        rec_noise=0.0,
+        mode="train",
+        povme_test_fn=None,
+        pre_load=True,
+    ):
         super().__init__()
         self.fns = fns
         assert center_to in ["lig", "rec", "none"]
@@ -43,7 +50,7 @@ class RecLigDataset(Dataset):
         self.rec_noise = rec_noise
         self.mode = mode
         self.extractced_interactions = None
-        
+
         self.pre_load = pre_load
         if pre_load:
             self.data = load_data_in_parallel(fns)
@@ -175,9 +182,11 @@ class RecLigDataset(Dataset):
             else:
                 pass
         elif self.mode == "extracted_interaction":
-            if True: # opt with same number of atom
+            if True:  # opt with same number of atom
                 # randomly choose NCIs from extracted NCIs
-                ext_e_index, ext_e_type = random.choice(self.extractced_interactions[idx])
+                ext_e_index, ext_e_type = random.choice(
+                    self.extractced_interactions[idx]
+                )
                 ext_lig_n = ext_e_index[1].max() + 1
                 cur_n = lig_graph.x.size(0)
                 assert ext_e_index[0].max() + 1 == rec_graph.x.size(0)
@@ -208,35 +217,39 @@ class RecLigDataset(Dataset):
                     pass
                 inter_e_index = torch.Tensor(ext_e_index)
                 inter_e_type = torch.Tensor(ext_e_type)
-            else: # opt with new sampling from POVME
+            else:  # opt with new sampling from POVME
                 povme_v = self.my_key_to_v[lig_graph.my_key]
                 povme_sampled_n = self.prior_atom_sampler.sample(povme_v)
-                ext_e_index, ext_e_type = random.choice(self.extractced_interactions[idx]) 
+                ext_e_index, ext_e_type = random.choice(
+                    self.extractced_interactions[idx]
+                )
                 ext_e_index = torch.Tensor(ext_e_index).long()
                 ext_e_type = torch.Tensor(ext_e_type).long()
-                ext_lig_n = ext_e_index[1].max() + 1 # extracted n 
+                ext_lig_n = ext_e_index[1].max() + 1  # extracted n
                 assert inter_e_index[0].max() + 1 == rec_graph.x.size(0)
                 # match lig_graph to ext (this will be always done)
                 inter_e_type = torch.zeros_like(inter_e_type)
                 # convert lig_graph to extracted
-                lig_graph, _, _ = edit_graph_and_inter_to_desired_n(lig_graph, inter_e_index, inter_e_type, ext_lig_n)
-                # convert all to povme_sampled n 
-                lig_graph, ext_e_index, ext_e_type = edit_graph_and_inter_to_desired_n(lig_graph, ext_e_index, ext_e_type, povme_sampled_n)
+                lig_graph, _, _ = edit_graph_and_inter_to_desired_n(
+                    lig_graph, inter_e_index, inter_e_type, ext_lig_n
+                )
+                # convert all to povme_sampled n
+                lig_graph, ext_e_index, ext_e_type = edit_graph_and_inter_to_desired_n(
+                    lig_graph, ext_e_index, ext_e_type, povme_sampled_n
+                )
                 inter_e_index = ext_e_index.long()
                 inter_e_type = ext_e_type.long()
-                
+
         return rec_graph, lig_graph, inter_e_index.long(), inter_e_type.long()
 
 
 def edit_graph_and_inter_to_desired_n(lig_graph, inter_e_index, inter_e_type, target_n):
-    "this function works in tensor "
+    "this function works in tensor"
     current_n = lig_graph.x.size(0)
-    assert current_n == inter_e_index[1].max() + 1 
+    assert current_n == inter_e_index[1].max() + 1
     if target_n < current_n:
         for _ in range(current_n - target_n):
-            non_inter_lig_node_idx = get_non_inter_lig_idx(
-                inter_e_index, inter_e_type
-            )
+            non_inter_lig_node_idx = get_non_inter_lig_idx(inter_e_index, inter_e_type)
             if len(non_inter_lig_node_idx) >= 1:
                 (
                     lig_graph,

@@ -2,10 +2,10 @@
 seed: 2024 
 
 # protein and reference ligand (preferred)
-protein_fn:
-ligand_fn:
+protein_fn:  # data/sample/pro.pdb
 # pocket (if available. if pocket is given, reference ligand is not used.)
-receptor_fn:
+receptor_fn: data/sample/rec.pdb
+ligand_fn: data/sample/ref.sdf
 
 # save dirn
 save_dirn: generate/sample_0/
@@ -22,6 +22,11 @@ prior_atom:
   povme_v_sigma: 50.0 # 50.0
   povme_n_sigma: 2.0 # 2.0
 
+# inpainting / restricted generations 
+given_reference_interaction: none # none, include, exact, extracted, from_predictor
+extracted_interaction_fn: # generate/final_1_morerepaint_eval/nci_top_score_0.1.pkl # ~.pt
+nci_predictor_model_fn: # save_nci_predictor/240806_whole_0/ # dirn
+
 # resampling 
 repaint_iter: 4 # 4
 repaint_start_step: 600 # 400, 600, 800
@@ -34,5 +39,5 @@ inter_distance_guidance: 0.02 # 0.02
 steric_guidance: 0.02 # 0.02
 
 # params
-bs: 10 # 10, 25, 50, 100
+bs: 5 # 10, 25, 50, 100
 n_generate: 100 # number of generation per pocket
