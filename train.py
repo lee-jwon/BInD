@@ -26,10 +26,10 @@ from torch.utils.tensorboard import SummaryWriter
 from torch_scatter import scatter, scatter_mean
 from tqdm import tqdm
 
-from main.dataset import RecLigDataset, rec_lig_collate_fn
 from main.diffusion.beta_schedule import get_beta_schedule
 from main.diffusion.transition import CategoricalTransition, ContinuousTransition
-from main.loss import BaselineLoss
+from main.model.dataset import RecLigDataset, rec_lig_collate_fn
+from main.model.loss import BaselineLoss
 from main.model.model import GenDiff
 from main.utils.file import recreate_directory
 from main.utils.system import (

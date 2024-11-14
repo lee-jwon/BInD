@@ -6,6 +6,10 @@ from rdkit import Chem
 from rdkit.Chem import AllChem, rdmolfiles
 from rdkit.Geometry import Point3D
 
+from Bio.PDB import PDBIO, PDBParser
+from Bio.PDB.PDBIO import Select
+from scipy.spatial import distance_matrix
+
 
 def xyz_to_sdf(xyz_fn, sdf_fn):
     assert xyz_fn[:-3] == "xyz" and sdf_fn[:-3] == "sdf"
@@ -105,3 +109,42 @@ def recreate_directory(path):
         shutil.rmtree(path)
     os.makedirs(path)
     return
+
+
+def extract_pocket(
+        ligand_sdf,
+        protein_pdb,
+        pocket_pdb,
+        cutoff=10.0,
+    ):
+    assert os.path.exists(ligand_sdf), "No ligand sdf file"
+    assert os.path.exists(protein_pdb), "No protein pdb file"
+
+    parser = PDBParser()
+    structure = parser.get_structure("protein", protein_pdb)
+    ligand_mol = read_mol_file(ligand_sdf)
+    ligand_positions = ligand_mol.GetConformer().GetPositions()
+
+    class DistSelect(Select):
+        def accept_residue(self, residue):
+            if residue.get_resname() == "HOH":
+                return 0
+            if residue.get_id()[0] != " ":
+                return 0
+            residue_positions = np.array(
+                [
+                    np.array(list(atom.get_vector()))
+                    for atom in residue.get_atoms()
+                    if "H" not in atom.get_id()
+                ]
+            )
+            min_dis = np.min(distance_matrix(residue_positions, ligand_positions))
+            if min_dis < cutoff:
+                return 1
+            else:
+                return 0
+
+    io = PDBIO()
+    io.set_structure(structure)
+    io.save(pocket_pdb, DistSelect())
+    return 
