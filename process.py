@@ -479,8 +479,62 @@ def process_receptor(rec_mol, radius_cutoff=8.0):
 
     return out
 
+def get_process(receptor_fn, ligand_fn):
 
-def run(input):
+    out = {
+        "rec_fn": receptor_fn,
+        "lig_fn": ligand_fn
+    }
+
+    rec_mol = read_pdb_file(out["rec_fn"])
+    lig_mol = Chem.SDMolSupplier(out["lig_fn"], sanitize=False)[0]
+    try:
+        lig_mol = Chem.RemoveHs(lig_mol)
+    except:
+        pass
+    assert rec_mol != None, "rec mol is none"
+    assert lig_mol != None, "lig mol is none"
+
+    if not LIG_USE_AROMATIC:  # not use aromatic
+        Chem.Kekulize(lig_mol, clearAromaticFlags=True)
+    else:  # use aromatic
+        Chem.rdmolops.SanitizeMol(
+            lig_mol, sanitizeOps=Chem.rdmolops.SanitizeFlags.SANITIZE_SETAROMATICITY
+        )
+
+    out["lig"] = process_ligand(lig_mol)
+    out["rec"] = process_receptor(rec_mol)
+    n_lig, n_rec = lig_mol.GetNumAtoms(), rec_mol.GetNumAtoms()
+
+    time.sleep(0.5)
+
+    # process interaction
+    _, cmplx_fn = join_complex(sample["lig_fn"], sample["rec_fn"])
+    inter_info = get_complex_interaction_info(cmplx_fn)
+    inter_info = sanitize_pocket_interaction(inter_info, n_lig)
+
+    time.sleep(0.5)
+    # remove temp file
+    os.remove(cmplx_fn)
+
+    # make interaction array with index
+    out["inter"] = {}
+    rec_to_lig_index = [[t1, t2] for t1 in range(n_rec) for t2 in range(n_lig)]
+    rec_to_lig_index = np.array(rec_to_lig_index).T
+    rec_to_lig_type = np.zeros([rec_to_lig_index.shape[1]]).astype(int)
+    for i, key in enumerate(inter_info):
+        for rec_idx, lig_idx in inter_info[key]:
+            rec_to_lig_type[n_lig * rec_idx + lig_idx] = i + 1  # 0: non-intr
+    out["inter"]["rec_to_lig_index"] = rec_to_lig_index.astype(int)
+    out["inter"]["rec_to_lig_type"] = rec_to_lig_type.astype(int)
+    assert (
+        out["inter"]["rec_to_lig_index"].shape[1]
+        == out["inter"]["rec_to_lig_type"].shape[0]
+    )
+    assert out != None
+    return out
+
+def run_process(input):
     sample, save_dir = input
     data_fn = f"{sample['my_key']}.pkl"
 
@@ -544,7 +598,7 @@ def run(input):
 
 def run_try(*inputs):
     try:
-        x = run(*inputs)
+        x = run_process(*inputs)
     except Exception as e:
         emsg = f"{e} \n {inputs} \n"
         print(emsg, flush=True)  # for debugging
@@ -640,7 +694,7 @@ if __name__ == "__main__":
     print("test data raw", len(test_data))
     test_process_input = [(sample, test_save_dirn) for sample in test_data]
     if PARMAP_OR_MP == "mp":
-        multiprocessing_wrap(run, test_process_input, 10)
+        multiprocessing_wrap(run_process, test_process_input, 10)
     elif PARMAP_OR_MP == "parmap":
         test_result = parmap.map(
             run_try, test_process_input, pm_pbar=True, pm_processes=10
@@ -651,7 +705,7 @@ if __name__ == "__main__":
         print("valid data raw", len(valid_data))
         valid_process_input = [(sample, valid_save_dirn) for sample in valid_data]
         if PARMAP_OR_MP == "mp":
-            multiprocessing_wrap(run, valid_process_input, 10)
+            multiprocessing_wrap(run_process, valid_process_input, 10)
         elif PARMAP_OR_MP == "parmap":
             valid_result = parmap.map(
                 run_try, valid_process_input, pm_pbar=True, pm_processes=10
@@ -663,7 +717,7 @@ if __name__ == "__main__":
         print("train data raw", len(train_data))
         train_process_input = [(sample, train_save_dirn) for sample in train_data]
         if PARMAP_OR_MP == "mp":
-            multiprocessing_wrap(run, train_process_input, N_PROCESS)
+            multiprocessing_wrap(run_process, train_process_input, N_PROCESS)
         elif PARMAP_OR_MP == "parmap":
             train_result = parmap.map(
                 run_try, train_process_input, pm_pbar=True, pm_processes=N_PROCESS
