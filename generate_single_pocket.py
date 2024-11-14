@@ -470,9 +470,14 @@ def graph_3d_to_rdmol(h, x, edge_index, edge_attr, one_hot=True):
     return rw_mol.GetMol()
 
 
-def prepare_input_data(protein_fn, ligand_fn, receptor_fn):
-    # 1. Extract pocket
-    extract_pocket(ligand_fn, protein_fn, receptor_fn)
+def prepare_input_data(receptor_fn, protein_fn=None, ligand_fn=None, extract=True):
+    if extract:
+        assert protein_fn is not None and ligand_fn is not None
+        assert os.path.exists(protein_fn) and os.path.exists(ligand_fn)
+        # 1. Extract pocket
+        extract_pocket(ligand_fn, protein_fn, receptor_fn)
+    else:
+        assert os.path.exists(receptor_fn)
 
     # 2. Run POVME
     os.chdir(TEMPFILE_DIR) # ./temp
@@ -523,7 +528,6 @@ if __name__ == "__main__":
         fix_seed(confs["seed"])
         logging.info(f"seed fixed to {confs.seed}")
 
-    # TODO: merge train_conf with sample_conf
     train_confs_fn = os.path.join(confs["model_dirn"], "config.yaml")
     with open(train_confs_fn, "r") as file:
         train_confs = yaml.safe_load(file)
@@ -543,36 +547,32 @@ if __name__ == "__main__":
     logging.info(f"prior atom sampler loaded: {prior_atom_sampler}")
     time.sleep(2)
 
-    # get test files
-    test_data_dirn = confs.test_data_dirn
-    test_fns = list(glob.glob(test_data_dirn + "/*.pkl"))
-    test_fns = sorted(test_fns, key=lambda fn: int(os.path.basename(fn)[:-4]))
-    logging.info(f"{len(test_fns)} data loaded for generation")
-    time.sleep(2)
+    # prepare input
+    if confs["receptor_fn"] is not None:
+        input_data = prepare_input_data(confs["receptor_fn"], extract=False)
+    else:
+        receptor_fn = os.path.join(
+            TEMPFILE_DIR, 
+            os.path.basename(confs["protein_fn"])[:-4] + "_poc.pdb",
+        )
+        input_data = prepare_input_data(
+            receptor_fn,
+            protein_fn=confs["protein_fn"],
+            ligand_fn=confs["ligand_fn"],
+            extract=True
+        )
+    input_data["my_key"] = 0
 
-    if confs.data_id is not None:
-        test_fns = [f"{test_data_dirn}/{confs['data_id']}.pkl"] * confs.bs
-    logging.info(f"Generating with {len(test_fns)} test data")
+    logging.info(f"Generating with receptor: {input_data['rec_fn']} and ligand: {input_data['lig_fn']}")
 
     test_set = RecLigDataset(
-        test_fns,
+        [input_data] * confs["bs"],
         center_to="rec",
         rec_noise=0.0,
         mode=confs.prior_atom.method,
-        povme_test_fn=confs.prior_atom.povme_test_result_fn,
+        is_dict=True,
     )
     test_set.append_sampler(prior_atom_sampler)
-
-    # if extracted interactions, pass this
-    extracted_interactions, predictor_model = None, None
-    if confs.given_reference_interaction == "extracted":
-        with open(confs.extracted_interaction_fn, "rb") as f:
-            extracted_interactions = pickle.load(f)
-        if confs.data_id != None:  # if single generation mode
-            extracted_interactions = [extracted_interactions] * confs.bs
-        test_set.append_extracted_interactions(extracted_interactions)
-    elif confs.given_reference_interaction == "from_predictor":
-        predictor_model = load_NCI_predictor(confs.nci_predictor_model_fn)
 
     # loader
     test_loader = DataLoader(
@@ -639,7 +639,7 @@ if __name__ == "__main__":
     ]
 
     # generate loop
-    for n_gen_idx in range(confs.n_generate):
+    for n_gen_idx in range(confs.n_generate // confs.bs):
         test_idx = 0
         for _, batch in enumerate(tqdm(test_loader)):
             with torch.no_grad():
@@ -661,16 +661,9 @@ if __name__ == "__main__":
                     test_fn = test_fns[test_idx]
                     ori_data_graph = test_set[test_idx]
 
-                    if confs.data_id != None:
-                        gen_dirn = f""
-                        gen_dirn = os.path.join(confs["save_mol_dirn"], gen_dirn)
-                        if not os.path.exists(gen_dirn):
-                            os.makedirs(gen_dirn)
-                    else:
-                        gen_dirn = f"{test_idx + 1}/"
-                        gen_dirn = os.path.join(confs["save_mol_dirn"], gen_dirn)
-                        if not os.path.exists(gen_dirn):
-                            os.makedirs(gen_dirn)
+                    gen_dirn = confs["save_mol_dirn"]
+                    if not os.path.exists(gen_dirn):
+                        os.makedirs(gen_dirn)
 
                     mol = graph_3d_to_rdmol(
                         h_type,
@@ -680,22 +673,15 @@ if __name__ == "__main__":
                         one_hot=False,
                     )
 
-                    if confs.data_id != None:
-                        gen_fn = os.path.join(
-                            gen_dirn, f"gen_{n_gen_idx * confs.bs + test_idx + 1}.sdf"
-                        )
-                        write_mols_to_sdf([mol], gen_fn)
-                        gen_inter_fn = os.path.join(
-                            gen_dirn, f"gen_{n_gen_idx * confs.bs + test_idx + 1}.pkl"
-                        )
-                        with open(gen_inter_fn, "wb") as f:
-                            pickle.dump(interaction_dict, f)
-                    else:
-                        gen_fn = os.path.join(gen_dirn, f"gen_{n_gen_idx+1}.sdf")
-                        write_mols_to_sdf([mol], gen_fn)
-                        gen_inter_fn = os.path.join(gen_dirn, f"gen_{n_gen_idx+1}.pkl")
-                        with open(gen_inter_fn, "wb") as f:
-                            pickle.dump(interaction_dict, f)
+                    gen_fn = os.path.join(
+                        gen_dirn, f"gen_{n_gen_idx * confs.bs + test_idx + 1}.sdf"
+                    )
+                    write_mols_to_sdf([mol], gen_fn)
+                    #gen_inter_fn = os.path.join(
+                    #    gen_dirn, f"gen_{n_gen_idx * confs.bs + test_idx + 1}.pkl"
+                    #)
+                    #with open(gen_inter_fn, "wb") as f:
+                    #    pickle.dump(interaction_dict, f)
 
                     test_idx += 1
 

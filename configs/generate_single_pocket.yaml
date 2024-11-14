@@ -1,12 +1,16 @@
 # seed
 seed: 2024 
 
-# dirs
-data_dirn:
-save_dirn: generate/public_0/
+# protein and reference ligand (preferred)
+protein_fn:
+ligand_fn:
+# pocket (if available. if pocket is given, reference ligand is not used.)
+receptor_fn:
+
+# save dirn
+save_dirn: generate/sample_0/
 
 # model dirns
-test_data_dirn: data/processed/test/
 model_dirn: save/public/
 model_cut: best # best
 
@@ -17,10 +21,6 @@ prior_atom:
   povme_test_result_fn: data/povme/sequence_split_test.csv
   povme_v_sigma: 50.0 # 50.0
   povme_n_sigma: 2.0 # 2.0
-
-# inpainting / restricted generations 
-given_reference_interaction: none # none, include, exact, extracted, from_predictor
-extracted_interaction_fn: # generate/final_1_morerepaint_eval/nci_top_score_0.1.pkl # ~.pt
 
 # resampling 
 repaint_iter: 4 # 4

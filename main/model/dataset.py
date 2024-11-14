@@ -34,7 +34,7 @@ def load_data_in_parallel(fns):
 
 class RecLigDataset(Dataset):
     def __init__(
-        self, fns, center_to="none", rec_noise=0.0, mode="train", povme_test_fn=None, pre_load=True):
+        self, fns, center_to="none", rec_noise=0.0, mode="train", povme_test_fn=None, pre_load=True, is_dict=True):
         super().__init__()
         self.fns = fns
         assert center_to in ["lig", "rec", "none"]
@@ -42,19 +42,21 @@ class RecLigDataset(Dataset):
         self.center_to = center_to
         self.rec_noise = rec_noise
         self.mode = mode
-        self.extractced_interactions = None
+        self.extracted_interactions = None
         
         self.pre_load = pre_load
         if pre_load:
             self.data = load_data_in_parallel(fns)
+        if is_dict:
+            self.data = self.fns
 
-        # read povme? # TODO: this seems to be moved to somewhere else
-        # if True:
         if mode == "povme":
-            povme_test_fn = povme_test_fn
-            df = pd.read_csv(povme_test_fn)
-            self.my_key_to_v = dict(zip(df["my_key"], df["v"]))
-            # print(self.my_key_to_v)
+            if povme_test_fn is not None:
+                df = pd.read_csv(povme_test_fn)
+                self.my_key_to_v = dict(zip(df["my_key"], df["v"]))
+            else:
+                assert self.__len__() == 1 # need to be single data
+                self.my_key_to_v = {0: self.data[0]["v"]}
 
     def __len__(self):
         return len(self.fns)
@@ -63,12 +65,12 @@ class RecLigDataset(Dataset):
         self.prior_atom_sampler = x
 
     def append_extracted_interactions(self, extracted_interactions):  # list of list
-        self.extractced_interactions = extracted_interactions
-        assert len(self.extractced_interactions) == len(self.data)
+        self.extracted_interactions = extracted_interactions
+        assert len(self.extracted_interactions) == len(self.data)
         self.mode = "extracted_interaction"
 
     def __getitem__(self, idx):
-        if self.pre_load:
+        if self.pre_load or self.is_dict:
             sample = deepcopy(self.data[idx])
         else:
             sample = load_pickle_file(self.fns[idx])
