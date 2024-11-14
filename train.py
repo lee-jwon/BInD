@@ -147,13 +147,13 @@ def process(model, data_loader, confs, optimizer=None, scaler=None):
 def main_worker(gpu, ngpus_per_node, confs):
     # set path for logging
     log_file_path = os.path.join(confs["save_dirn"], "log.log")
-    err_file_path = os.path.join(confs["save_dirn"], "err.err")
+    # err_file_path = os.path.join(confs["save_dirn"], "err.err")
     logging.basicConfig(
         level=logging.INFO,
         format="%(asctime)s - %(levelname)s\n%(message)s",
         handlers=[logging.FileHandler(log_file_path), logging.StreamHandler()],
     )
-    sys.stderr = open(err_file_path, "w")
+    # sys.stderr = open(err_file_path, "w")
     time.sleep(2)
 
     # log confs

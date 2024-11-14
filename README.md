@@ -14,10 +14,10 @@ This repository is the official repository for BInD (**B**ond and **In**teractio
 
 ### Installation of Python Packages
 ```bash
-conda create -n bind python=3.9 -y
-conda activate bind
+conda create -n bindfull python=3.9 -y
+conda activate bindfull
 
-# machiene learning
+# ML
 conda install  scipy=1.11.3 numpy=1.26.0 pandas=2.1.1 scikit-learn=1.3.0 -y
 conda install pytorch==1.11.0 cudatoolkit=11.3 -c pytorch -y
 pip install torch-scatter==2.0.9 torch-sparse==0.6.15 torch-cluster==1.6.0 torch-geometric==2.1.0.post1 -f https://data.pyg.org/whl/torch-1.11.0+cu113.html
@@ -47,13 +47,14 @@ pip install matplotlib==3.8.1
 pip install seaborn==0.13.0
 ```
 
-### Downloading Data and Trained Checkpoints
+### Download Data and Trained Checkpoints
 | Data | Size | Link | Path |
 | - | - | - | - |
-| Raw data | 1.62GB | [Download Raw Data](https://drive.google.com/uc?export=download&id=1v1wOCpkXbemU9FE3utEXrAsVjm6pvnXN) | `data/raw/` |
-| Processed data | 3.64GB | | `data/processed/` |
-| Data split | 1.2MB | | `data/split/` |
-| Trained checkpoint | 1.2MB | | `data/` |
+| Raw data | 1.7GB | [Download Raw Data](https://drive.google.com/uc?export=download&id=1v1wOCpkXbemU9FE3utEXrAsVjm6pvnXN) | `data/raw/` |
+| Processed data (whole) | 3.7GB | | `data/processed/` |
+| Processed data (test) | 3.7GB | | `data/processed/` |
+| Data split keys | ?MB | | `data/split/` |
+| Trained checkpoint | 161MB | | `data/` |
 
 
 ## Training BInD From Scratch
@@ -61,10 +62,8 @@ pip install seaborn==0.13.0
 
 ### Data Preparation
 
-
-
 ```bash
-python -u train.py configs/train.yaml
+python -u process.py 
 ```
 
 
@@ -80,7 +79,21 @@ python -u train.py configs/train.yaml
 ```
 
 
-## Genearting Molecule with BInD
+## Genearting Molecules with BInD
+
+
+### Molecule Generation for Test Set Pockets
+
+```bash
+python generate.py configs/generate.yaml
+```
+
+
+### Molecule Generation with a Given PDB
+
+```bash
+```
+
 
 
 ## Collaborators
