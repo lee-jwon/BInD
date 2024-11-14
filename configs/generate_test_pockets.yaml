@@ -12,9 +12,9 @@ get_trajectory: no
 trajectory_fn: # *.pkl
 
 # model dirns
-test_data_dirn: data/processed/test/
+test_data_dirn: data/processed/crossdocked_sequence_split_onlytest
 model_dirn: save/public/
-model_cut: 215 # best
+model_cut: best # best
 
 # prior atom sampling
 prior_atom:
@@ -30,7 +30,7 @@ extracted_interaction_fn: # generate/final_1_morerepaint_eval/nci_top_score_0.1.
 nci_predictor_model_fn: # save_nci_predictor/240806_whole_0/ # dirn
 
 # resampling 
-repaint_iter: 8 # 4
+repaint_iter: 4 # 4
 repaint_start_step: 600 # 400, 600, 800
 repaint_end_step: 1000 # 1000
 
