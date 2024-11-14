@@ -19,8 +19,8 @@ model_cut: best # best
 # prior atom sampling
 prior_atom:
   method: povme # ref, povme
-  povme_train_result_fn: data/povme_result/sequence_split_train.csv
-  povme_test_result_fn: data/povme_result/sequence_split_test.csv
+  povme_train_result_fn: data/povme/sequence_split_train.csv
+  povme_test_result_fn: data/povme/sequence_split_test.csv
   povme_v_sigma: 50.0 # 50.0
   povme_n_sigma: 2.0 # 2.0
 

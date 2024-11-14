@@ -8,7 +8,7 @@ import torch.nn as nn
 from torch_geometric.utils import to_dense_adj
 from torch_scatter import scatter_min
 
-from .model.layer import full_edge_to_half_edge, half_edge_to_full_edge
+from main.model.layer import full_edge_to_half_edge, half_edge_to_full_edge
 
 
 class BondDistanceGuidance(nn.Module):

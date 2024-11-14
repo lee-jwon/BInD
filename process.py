@@ -628,7 +628,7 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--recreate", action="store_true")
-    parser.add_argument("--split_fn", type=str)
+    parser.add_argument("--split_fn", type=str, default="./data/split/sequence.pt")
     parser.add_argument("--save_dirn", type=str)
     parser.add_argument("--raw_dirn", type=str)
     parser.add_argument("--tempfile_dirn", type=str, default="./temp/")

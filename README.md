@@ -68,8 +68,10 @@ You can download the `.tar.gz` files provided above, extract them, and place the
 
 ### Data Preparation
 
+**Warning:** Using `--recreate` parameter will overwrite the existing directory where training checkpoints are saved.
+
 ```bash
-python -u process.py 
+python -u process.py --recreate --save_dirn ./data/processed/my_data/ --raw_dirn ./data/raw/crossdocked_pocket10 
 ```
 
 
