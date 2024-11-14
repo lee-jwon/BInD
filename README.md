@@ -89,21 +89,21 @@ python -u train.py configs/train.yaml
   <tr>
     <td align="center">
       <a href="https://github.com/oneoftwo">
-        <img src="https://github.com/oneoftwo.png?size=600" width="100" height="100" style="border-radius:50%;">
+        <img src="https://github.com/oneoftwo.png?size=600" width="100" height="100" style="clip-path:circle(50% at center);">
         <br />
         Lee, Joongwon
       </a>
     </td>
     <td align="center">
       <a href="https://github.com/WonhoZhung">
-        <img src="https://github.com/WonhoZhung.png?size=600" width="100" height="100" style="border-radius:50%;">
+        <img src="https://github.com/WonhoZhung.png?size=600" width="100" height="100" style="clip-path:circle(50% at center);">
         <br />
         Zhung, Wonho
       </a>
     </td>
     <td align="center">
       <a href="https://github.com/SeoJisu0305">
-        <img src="https://github.com/SeoJisu0305.png?size=600" width="100" height="100" style="border-radius:50%;">
+        <img src="https://github.com/SeoJisu0305.png?size=600" width="100" height="100" style="clip-path:circle(50% at center);">
         <br />
         Seo, Jisu
       </a>
