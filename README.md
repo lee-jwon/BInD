@@ -102,7 +102,7 @@ python generate_test_pockets.py configs/generate_test_pockets.yaml
 ### Pocket Conditioned Molecule Generation
 
 ```bash
-python generate.py configs/generate.yaml
+python generate_single_pocket.py configs/generate_single_pocket.yaml
 ```
 
 
