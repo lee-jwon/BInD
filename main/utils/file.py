@@ -1,6 +1,7 @@
 import os
 import shutil
 from copy import deepcopy
+import numpy as np
 
 from rdkit import Chem
 from rdkit.Chem import AllChem, rdmolfiles
@@ -110,18 +111,20 @@ def recreate_directory(path):
     os.makedirs(path)
     return
 
+
 def get_n_lines(file):
     with open(file, "r") as file:
         lines = file.readlines()
     number_of_lines = len(lines)
     return number_of_lines
 
+
 def extract_pocket(
-        ligand_sdf,
-        protein_pdb,
-        pocket_pdb,
-        cutoff=10.0,
-    ):
+    ligand_sdf,
+    protein_pdb,
+    pocket_pdb,
+    cutoff=10.0,
+):
     assert os.path.exists(ligand_sdf), "No ligand sdf file"
     assert os.path.exists(protein_pdb), "No protein pdb file"
 
@@ -132,10 +135,13 @@ def extract_pocket(
 
     class DistSelect(Select):
         def accept_residue(self, residue):
+            # Exclude water and hetero residues
             if residue.get_resname() == "HOH":
                 return 0
             if residue.get_id()[0] != " ":
                 return 0
+
+            # Get positions of atoms excluding hydrogen
             residue_positions = np.array(
                 [
                     np.array(list(atom.get_vector()))
@@ -143,13 +149,19 @@ def extract_pocket(
                     if "H" not in atom.get_id()
                 ]
             )
-            min_dis = np.min(distance_matrix(residue_positions, ligand_positions))
-            if min_dis < cutoff:
-                return 1
-            else:
-                return 0
+            
+            # Calculate the centroid of the residue
+            residue_centroid = np.mean(residue_positions, axis=0)
+            
+            # Check if the distance between the residue centroid and any ligand atom is within the cutoff
+            for ligand_atom_position in ligand_positions:
+                distance = np.linalg.norm(residue_centroid - ligand_atom_position)
+                if distance < cutoff:
+                    return 1  # Select the residue if within 10 Å distance of any ligand atom
+
+            return 0  # Skip the residue if not within the cutoff for any ligand atom
 
     io = PDBIO()
     io.set_structure(structure)
     io.save(pocket_pdb, DistSelect())
-    return 
+    return

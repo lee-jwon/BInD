@@ -379,8 +379,9 @@ def process_ligand(lig_mol):
     return out
 
 
-def process_receptor(rec_mol, radius_cutoff=8.0):
-    assert filter_receptor(rec_mol), "receptor filtered out!"
+def process_receptor(rec_mol, radius_cutoff=8.0, filter=True):
+    if filter:
+        assert filter_receptor(rec_mol), "receptor filtered out!"
     out = {}
     # print("num atom", rec_mol.GetNumAtoms())
 
@@ -479,7 +480,7 @@ def process_receptor(rec_mol, radius_cutoff=8.0):
 
     return out
 
-def get_process(receptor_fn, ligand_fn):
+def get_process(receptor_fn, ligand_fn, filter=False):
 
     out = {
         "rec_fn": receptor_fn,
@@ -503,13 +504,13 @@ def get_process(receptor_fn, ligand_fn):
         )
 
     out["lig"] = process_ligand(lig_mol)
-    out["rec"] = process_receptor(rec_mol)
+    out["rec"] = process_receptor(rec_mol, filter=filter)
     n_lig, n_rec = lig_mol.GetNumAtoms(), rec_mol.GetNumAtoms()
 
     time.sleep(0.5)
 
     # process interaction
-    _, cmplx_fn = join_complex(sample["lig_fn"], sample["rec_fn"])
+    _, cmplx_fn = join_complex(out["lig_fn"], out["rec_fn"])
     inter_info = get_complex_interaction_info(cmplx_fn)
     inter_info = sanitize_pocket_interaction(inter_info, n_lig)
 

@@ -85,30 +85,30 @@ class SeparatedInterBondDistanceGuidance(nn.Module):
         super().__init__()
 
         self.n_types = 6
-        '''self.dmin_maxs = [
+        """self.dmin_maxs = [
             [2.0, 5.5], # SB
             [2.0, 5.5], # SB
             [2.0, 4.1], # HB 
             [2.0, 4.1], # HB 
             [2.0, 4.0], # HI
             [2.0, 5.5], # PP
-        ]'''
+        ]"""
         # min max from data distribution (reference)
-        '''self.dmin_maxs = [
+        """self.dmin_maxs = [
             [2.8, 7.5], # SB
             [2.0, 5.5], # SB
             [2.4, 4.1], # HB 
             [2.4, 4.1], # HB 
             [3.0, 4.0], # HI
             [3.0, 7.0], # PP
-        ]'''
+        ]"""
         self.dmin_maxs = [
-            [2.8, 7.5], # SB
-            [2.8, 7.5], # SB
-            [2.4, 4.1], # HB 
-            [2.4, 4.1], # HB 
-            [2.0, 4.0], # HI
-            [3.0, 7.0], # PP
+            [2.8, 7.5],  # SB
+            [2.8, 7.5],  # SB
+            [2.4, 4.1],  # HB
+            [2.4, 4.1],  # HB
+            [2.0, 4.0],  # HI
+            [3.0, 7.0],  # PP
         ]
 
         self.epsilon1 = epsilon1
@@ -133,12 +133,7 @@ class SeparatedInterBondDistanceGuidance(nn.Module):
 
 
 class StericClashGuidance(nn.Module):
-    def __init__(
-            self, 
-            distance_min=0.5, 
-            epsilon=0.1, 
-            mode="every" # nearest, every
-    ):
+    def __init__(self, distance_min=0.5, epsilon=0.1, mode="every"):  # nearest, every
         super().__init__()
 
         self.distance_min = distance_min
