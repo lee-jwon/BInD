@@ -493,7 +493,7 @@ def prepare_input_data(receptor_fn, protein_fn=None, ligand_fn=None, extract=Tru
     os.chdir("..")
 
     # 3. Data processing
-    input_data = get_process(receptor_fn, ligand_fn, filter=True)
+    input_data = get_process(receptor_fn, ligand_fn, filter=False)
     input_data["v"] = n_povme
     input_data["n"] = input_data["lig"]["x"].shape[0]
     return input_data

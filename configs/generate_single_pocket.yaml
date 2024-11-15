@@ -2,9 +2,9 @@
 seed: 2024 
 
 # protein and reference ligand (preferred)
-protein_fn:  # data/sample/pro.pdb
+protein_fn:  data/sample/pro.pdb # data/sample/pro.pdb
+receptor_fn: # data/sample/rec.pdb
 # pocket (if available. if pocket is given, reference ligand is not used.)
-receptor_fn: data/sample/rec.pdb
 ligand_fn: data/sample/ref.sdf
 
 # save dirn

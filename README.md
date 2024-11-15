@@ -71,7 +71,7 @@ You can download the `.tar.gz` files provided above, extract them, and place the
 **Warning:** Using `--recreate` parameter will overwrite the existing directory where training checkpoints are saved.
 
 ```bash
-python -u process.py --recreate --save_dirn ./data/processed/my_data/ --raw_dirn ./data/raw/crossdocked_pocket10 
+python process.py --recreate --save_dirn ./data/processed/my_data/ --raw_dirn ./data/raw/crossdocked_pocket10 
 ```
 
 
@@ -85,7 +85,7 @@ Additionally, setting the `pre_load_dataset` option to yes will load the dataset
 **Warning:** Setting the `save_dirn` parameter will overwrite the existing directory where training checkpoints are saved.
 
 ```bash
-python -u train.py configs/train.yaml
+python train.py configs/train.yaml
 ```
 
 
@@ -104,7 +104,6 @@ python generate_test_pockets.py configs/generate_test_pockets.yaml
 ```bash
 python generate.py configs/generate.yaml
 ```
-
 
 
 ## Collaborators

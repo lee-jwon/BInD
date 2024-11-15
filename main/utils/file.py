@@ -135,10 +135,13 @@ def extract_pocket(
 
     class DistSelect(Select):
         def accept_residue(self, residue):
+            # Exclude water and hetero residues
             if residue.get_resname() == "HOH":
                 return 0
             if residue.get_id()[0] != " ":
                 return 0
+
+            # Get positions of atoms excluding hydrogen
             residue_positions = np.array(
                 [
                     np.array(list(atom.get_vector()))
@@ -146,11 +149,17 @@ def extract_pocket(
                     if "H" not in atom.get_id()
                 ]
             )
-            min_dis = np.min(distance_matrix(residue_positions, ligand_positions))
-            if min_dis < cutoff:
-                return 1
-            else:
-                return 0
+            
+            # Calculate the centroid of the residue
+            residue_centroid = np.mean(residue_positions, axis=0)
+            
+            # Check if the distance between the residue centroid and any ligand atom is within the cutoff
+            for ligand_atom_position in ligand_positions:
+                distance = np.linalg.norm(residue_centroid - ligand_atom_position)
+                if distance < cutoff:
+                    return 1  # Select the residue if within 10 Å distance of any ligand atom
+
+            return 0  # Skip the residue if not within the cutoff for any ligand atom
 
     io = PDBIO()
     io.set_structure(structure)
