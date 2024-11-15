@@ -116,33 +116,6 @@ def generate_single_batch(
     gen_inter_e = inter_e_init
     gen_inter_e = gen_inter_e.cuda()
 
-    # set answer distribution for inpainting
-    if confs.given_reference_interaction == "include":
-        answer_pred_inter_e = inter_e_transition.idx_to_logprob(
-            answer_inter_e_type.cuda()
-        )
-        inter_e_inpaint_mask = (
-            (answer_inter_e_type != 0).cuda().unsqueeze(1).float()
-        )  # 1 to force
-    elif (
-        confs.given_reference_interaction == "exact"
-        or confs.given_reference_interaction == "extracted"
-    ):
-        answer_pred_inter_e = inter_e_transition.idx_to_logprob(
-            answer_inter_e_type.cuda()
-        )
-    elif confs.given_reference_interaction == "from_predictor":
-        assert predictor_model is not None
-        sampled_inter_e, _ = predictor_model.sample(rec_graph)
-        answer_pred_inter_e = inter_e_transition.idx_to_logprob(sampled_inter_e.cuda())
-        inter_e_inpaint_mask = (
-            (answer_inter_e_type != 0).cuda().unsqueeze(1).float()
-        )  # 1 to force
-    elif confs.given_reference_interaction == "none":
-        pass
-    else:
-        raise NotImplementedError
-
 
     # denoise
     for i, step in tqdm(enumerate(range(0, n_timestep)[::-1]), total=n_timestep):
@@ -205,27 +178,6 @@ def generate_single_batch(
             pred_lig_e = torch.log_softmax(pred_lig_e, dim=1)
             pred_inter_e = model.pred_inter_e_from_embded(embded_inter_e)
             pred_inter_e = torch.log_softmax(pred_inter_e, dim=1)
-
-            # reference NCI, or from predictor
-            if (
-                confs.given_reference_interaction == "include"
-                or confs.given_reference_interaction == "from_predictor"
-            ):
-                pred_inter_e = (
-                    inter_e_inpaint_mask * answer_pred_inter_e
-                    + (1 - inter_e_inpaint_mask) * pred_inter_e
-                )
-            # reference NCI exact, or from extracted (dealt in dataset)
-            elif (
-                confs.given_reference_interaction == "exact"
-                or confs.given_reference_interaction == "extracted"
-            ):
-                pred_inter_e = answer_pred_inter_e
-            # without any NCI inpainting
-            elif confs.given_reference_interaction == "none":
-                pass
-            else:
-                raise NotImplementedError
 
             # bond distance guidance
             if a_bd > 0:
@@ -470,13 +422,14 @@ def graph_3d_to_rdmol(h, x, edge_index, edge_attr, one_hot=True):
     return rw_mol.GetMol()
 
 
-def prepare_input_data(receptor_fn, protein_fn=None, ligand_fn=None, extract=True):
+def prepare_input_data(receptor_fn, ligand_fn, protein_fn=None, extract=True):
     if extract:
         assert protein_fn is not None and ligand_fn is not None
         assert os.path.exists(protein_fn) and os.path.exists(ligand_fn)
         # 1. Extract pocket
         extract_pocket(ligand_fn, protein_fn, receptor_fn)
     else:
+        assert os.path.exists(ligand_fn)
         assert os.path.exists(receptor_fn)
 
     # 2. Run POVME
@@ -487,14 +440,12 @@ def prepare_input_data(receptor_fn, protein_fn=None, ligand_fn=None, extract=Tru
     os.system(cmnd)
     povme_fn = "./pocket1.pdb"
     n_povme = get_n_lines(povme_fn)
-    n_lig = Chem.SDMolSupplier(lig_fn)[0].GetNumAtoms()
-    os.remove(r"./pocket[0-9].pdb")
     os.chdir("..")
 
     # 3. Data processing
     input_data = get_process(receptor_fn, ligand_fn)
     input_data["v"] = n_povme
-    input_data["n"] = n_lig
+    input_data["n"] = input_data["lig"]["x"].shape[0]
     return input_data
 
 
