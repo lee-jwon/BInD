@@ -2,7 +2,7 @@
 seed: 2024 
 
 # dirs
-save_dirn: generate/public_0/
+save_dirn: generate/sample_test/
 
 # debug
 data_id: # if given, generate only with this data id
