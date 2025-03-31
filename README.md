@@ -89,7 +89,7 @@ python train.py configs/train.yaml
 ```
 
 
-## Genearting Molecules with BInD
+## Generating Molecules with BInD
 
 
 ### Molecule Generation for Test Pockets
