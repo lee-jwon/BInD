@@ -105,6 +105,24 @@ python generate_test_pockets.py configs/generate_test_pockets.yaml
 python generate_single_pocket.py configs/generate_single_pocket.yaml
 ```
 
+## Publication✨
+
+[BInD: Bond and Interaction-Generating Diffusion Model for Multi-Objective Structure-Based Drug Design](https://advanced.onlinelibrary.wiley.com/doi/full/10.1002/advs.202502702)
+
+
+### Citation
+```
+@article{lee2025bind,
+  title={BInD: Bond and Interaction-Generating Diffusion Model for Multi-Objective Structure-Based Drug Design},
+  author={Lee, Joongwon and Zhung, Wonho and Seo, Jisu and Kim, Woo Youn},
+  journal={Advanced Science},
+  pages={e02702},
+  year={2025},
+  publisher={Wiley Online Library},
+  doi = {https://doi.org/10.1002/advs.202502702},
+}
+```
+
 
 ## Collaborators
 
