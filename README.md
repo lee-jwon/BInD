@@ -8,6 +8,11 @@ This repository is the official repository for BInD (**B**ond and **In**teractio
   <img src="assets/overview.png" width=1000" height="auto" /> 
 </p>
 
+
+## Publication ✨
+
+[BInD: Bond and Interaction-Generating Diffusion Model for Multi-Objective Structure-Based Drug Design](https://advanced.onlinelibrary.wiley.com/doi/full/10.1002/advs.202502702)
+
  
 ## Setup
 
@@ -104,10 +109,6 @@ python generate_test_pockets.py configs/generate_test_pockets.yaml
 ```bash
 python generate_single_pocket.py configs/generate_single_pocket.yaml
 ```
-
-## Publication✨
-
-[BInD: Bond and Interaction-Generating Diffusion Model for Multi-Objective Structure-Based Drug Design](https://advanced.onlinelibrary.wiley.com/doi/full/10.1002/advs.202502702)
 
 
 ### Citation
